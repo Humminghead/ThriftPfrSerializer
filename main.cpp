@@ -1,7 +1,6 @@
+#include "TModelField.h"
+#include "TPfrSerializer.h"
 #include <iostream>
-//#include "datatransportbase.h"
-#include "universalpipe.h"
-
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/protocol/TCompactProtocol.h>
 #include <thrift/protocol/TJSONProtocol.h>
@@ -11,26 +10,30 @@
 #include <thrift/transport/TSimpleFileTransport.h>
 #include <thrift/transport/TTransport.h>
 #include <thrift/transport/TVirtualTransport.h>
-
 using namespace std;
 using namespace apache::thrift;
 
-struct MyModel{
-    serialization::TModelField<int> a{"Field0", {}, true};
-//    serialization::TModelField<float> b{"Field1", {}, true};
-//    serialization::TModelField<std::string> c{"Field2", {}, true};
+struct MyModel {
+  static constexpr auto name = "MyModel";
+
+  serialization::TModelField<int> a{"Field0", {}, true};
+  serialization::TModelField<float> b{"Field1", {}, true};
+  serialization::TModelField<double> c{"Field2", {3.8}, false};
+  serialization::TModelField<std::map<int, int>> d{"Map", {}, false};
+  //    serialization::TModelField<std::string> c{"Field2", {}, true};
 };
 
-int main()
-{
-    auto trans = std::make_shared<transport::TSimpleFileTransport>("/tmp/json.txt", false, true);
-    auto proto = std::make_shared<protocol::TJSONProtocol>(trans);
+int main() {
+  auto trans = std::make_shared<transport::TSimpleFileTransport>(
+      "/tmp/json.txt", false, true);
+  auto proto = std::make_shared<protocol::TJSONProtocol>(trans);
 
-    MyModel data;
-    serialization::TPfrSerializer<MyModel> serialzer(proto);
+  MyModel data;
+  data.a.setValue(1);
+  data.b.setValue(2.5);
+  serialization::TPfrSerializer<MyModel> serialzer(proto);
 
-    serialzer.Serialize(std::move(data));
+  serialzer.serialize(std::move(data));
 
-
-    return 0;
+  return 0;
 }
