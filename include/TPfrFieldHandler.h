@@ -60,9 +60,8 @@ struct TPfrFieldHandler<
 };
 
 /*!
- * \brief T_MAP
+ * \brief T_MAP specialization
  */
-//template <>
 template <class Key, class Value>
 struct TPfrFieldHandler<std::map<Key, Value>> {
   static void handle(const std::map<Key, Value> &value,
