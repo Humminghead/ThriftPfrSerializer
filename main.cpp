@@ -19,18 +19,20 @@ struct MyModel {
   serialization::TModelField<int> a{"Field0", {}, true};
   serialization::TModelField<float> b{"Field1", {}, true};
   serialization::TModelField<double> c{"Field2", {3.8}, false};
-  serialization::TModelField<std::map<int, int>> d{"Map", {}, false};
+  serialization::TModelField<std::map<int, double>> d{"MapZ", {}, false};
   //    serialization::TModelField<std::string> c{"Field2", {}, true};
 };
 
 int main() {
   auto trans = std::make_shared<transport::TSimpleFileTransport>(
-      "/tmp/json.txt", false, true);
-  auto proto = std::make_shared<protocol::TJSONProtocol>(trans);
+      "/tmp/json.bin", false, true);
+  auto proto = std::make_shared<protocol::TBinaryProtocol>(trans);
 
   MyModel data;
   data.a.setValue(1);
   data.b.setValue(2.5);
+  data.d.getValue().try_emplace(4,5);
+  data.d.getValue().try_emplace(6,7);
   serialization::TPfrSerializer<MyModel> serialzer(proto);
 
   serialzer.serialize(std::move(data));

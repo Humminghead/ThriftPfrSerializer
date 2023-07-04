@@ -11,7 +11,7 @@ namespace apache::thrift::serialization {
 
 template <class Model> class TPfrSerializer {
   std::shared_ptr<protocol::TProtocol> protocol_;
-  size_t totalBytesWriten_;
+  uint32_t totalBytesWriten_;
 
 public:
   using thrift_model = Model;

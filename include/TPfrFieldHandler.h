@@ -1,11 +1,13 @@
 #pragma once
 
+#include "TPfrKeyValueHandler.h"
+#include "TPfrType.h"
+
 #include <memory.h>
 #include <string_view>
-#include <thrift/protocol/TProtocol.h>
 
 ///\todo enum TType {
-//T_STOP       = 0,
+// T_STOP       = 0,
 //    T_VOID       = 1,
 //    T_BOOL       = 2,
 //    T_BYTE       = 3,
@@ -34,7 +36,7 @@ template <class Field, class Enable = void> struct TPfrFieldHandler;
  */
 template <> struct TPfrFieldHandler<int32_t> {
   static void handle(const int &value, const std::string_view &name,
-                     const size_t &index, size_t &written,
+                     const size_t &index, uint32_t &written,
                      const std::shared_ptr<protocol::TProtocol> protocol) {
     written +=
         protocol->writeFieldBegin(name.data(), protocol::TType::T_I32, index);
@@ -50,7 +52,7 @@ template <class Field>
 struct TPfrFieldHandler<
     Field, typename std::enable_if_t<std::is_floating_point_v<Field>>> {
   static void handle(const Field &value, const std::string_view &name,
-                     const size_t &index, size_t &written,
+                     const size_t &index, uint32_t &written,
                      const std::shared_ptr<protocol::TProtocol> protocol) {
     written += protocol->writeFieldBegin(name.data(), protocol::TType::T_DOUBLE,
                                          index);
@@ -64,11 +66,19 @@ struct TPfrFieldHandler<
  */
 template <class Key, class Value>
 struct TPfrFieldHandler<std::map<Key, Value>> {
-  static void handle(const std::map<Key, Value> &value,
+  static void handle(const std::map<Key, Value> &map,
                      const std::string_view &name, const size_t &index,
-                     size_t &written,
+                     uint32_t &written,
                      const std::shared_ptr<protocol::TProtocol> protocol) {
-    int a = 0;
+    written += protocol->writeFieldBegin(name.data(),
+                                         protocol::TType::T_MAP, index);
+    written += protocol->writeMapBegin(TPfrType<Key>::type,
+                                       TPfrType<Value>::type, map.size());
+    for (auto &pair : map) {
+      KeyValueHandler<Key, Value>::handle(pair, protocol.get(), written);
+    }
+    written += protocol->writeMapEnd();
+    written += protocol->writeFieldEnd();
   }
 };
 

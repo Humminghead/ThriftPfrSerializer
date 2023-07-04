@@ -10,13 +10,17 @@ public:
   constexpr TModelField(std::string_view name, T &&value, bool empty = true)
       : name_{name}, value_{std::move(value)}, empty_{empty} {}
 
-  auto setValue(const T &value) noexcept { value_ = value; }
+  auto setValue(const T &value) noexcept {
+    setEmpty(false);
+    value_ = value;
+  }
   auto setValue(T &&value) noexcept {
     setEmpty(false);
     value_ = std::move(value);
   }
   auto setEmpty(const bool empty) noexcept { empty_ = empty; }
 
+  auto &getValue() noexcept { return value_; }
   auto &getValue() const noexcept { return value_; }
   auto &getName() const noexcept { return name_; }
   bool isEmpty() const noexcept { return empty_; };
