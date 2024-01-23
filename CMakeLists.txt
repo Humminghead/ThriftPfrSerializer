@@ -9,7 +9,7 @@ add_executable(tpfrserializer main.cpp)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE thrift)
+target_link_libraries(${PROJECT_NAME} PRIVATE thrift benchmark)
 
 install(TARGETS tpfrserializer
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
