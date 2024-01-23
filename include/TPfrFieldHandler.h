@@ -187,4 +187,22 @@ template <class Value> struct TPfrFieldHandler<std::list<Value>> {
   }
 };
 
+/*!
+ * \brief T_SET specialization
+ */
+template <class Value> struct TPfrFieldHandler<std::set<Value>> {
+  static void handle(const std::set<Value> &set, const std::string_view &name,
+                     const size_t &index, uint32_t &written,
+                     const std::shared_ptr<protocol::TProtocol> protocol) {
+    written +=
+        protocol->writeFieldBegin(name.data(), protocol::TType::T_SET, index);
+    written += protocol->writeSetBegin(TPfrType<Value>::type, set.size());
+    for (auto &es : set) {
+      ListValueHandler<Value>::handle(es, protocol.get(), written);
+    }
+    written += protocol->writeSetEnd();
+    written += protocol->writeFieldEnd();
+  }
+};
+
 } // namespace apache::thrift::serialize
