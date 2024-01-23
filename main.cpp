@@ -29,9 +29,10 @@ struct MyModel {
   serialize::TModelField<uint64_t> f7{"UInt64", {}, false};
   serialize::TModelField<float> f8{"Float", {}, false};
   serialize::TModelField<double> f9{"Double", {3.8}, false};
-  serialize::TModelField<std::map<int, double>> d{"Map", {}, false};
-  serialize::TModelField<std::string> f{"String", {"string"}, false};
-  serialize::TModelField<std::string_view> g{
+  serialize::TModelField<std::map<int, double>> f10{"Map", {}, false};
+  serialize::TModelField<std::string> f11{"String", {"string"}, false};
+  serialize::TModelField<std::list<int>> f12{"List", {1,2,3}, false};
+  serialize::TModelField<std::string_view> f13{
       "StringView", {"string_view"}, false};
 };
 
@@ -43,8 +44,9 @@ int main() {
   MyModel data;
   data.f2.SetValue(1);
   data.f9.SetValue(2.5);
-  data.d.ModValue().try_emplace(4, 5);
-  data.d.ModValue().try_emplace(6, 7);
+  data.f10.ModValue().try_emplace(4, 5);
+  data.f12.ModValue().push_back(12);
+  // data.f12.ModValue().emplace(7);
   serialize::TPfrSerializer<MyModel> serialzer(proto);
 
   serialzer.serialize(std::move(data));

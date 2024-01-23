@@ -8,11 +8,9 @@
 
 ///\todo enum TType {
 // T_STOP       = 0,
-
 //    T_UTF7       = 11,
 //    T_STRUCT     = 12,
 //    T_SET        = 14,
-//    T_LIST       = 15,
 //    T_UTF8       = 16,
 //    T_UTF16      = 17
 //};
@@ -167,6 +165,24 @@ template <> struct TPfrFieldHandler<std::string_view> {
     written +=
         protocol->writeString(s.data()); // only writeString(const std::string&
                                          // str) exists in TProtocol.h
+    written += protocol->writeFieldEnd();
+  }
+};
+
+/*!
+ * \brief T_LIST specialization
+ */
+template <class Value> struct TPfrFieldHandler<std::list<Value>> {
+  static void handle(const std::list<Value> &lst, const std::string_view &name,
+                     const size_t &index, uint32_t &written,
+                     const std::shared_ptr<protocol::TProtocol> protocol) {
+    written +=
+        protocol->writeFieldBegin(name.data(), protocol::TType::T_LIST, index);
+    written += protocol->writeListBegin(TPfrType<Value>::type, lst.size());
+    for (auto &el : lst) {
+      ListValueHandler<Value>::handle(el, protocol.get(), written);
+    }
+    written += protocol->writeListEnd();
     written += protocol->writeFieldEnd();
   }
 };
