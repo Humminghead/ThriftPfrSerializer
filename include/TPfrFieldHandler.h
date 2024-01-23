@@ -6,14 +6,12 @@
 #include <memory.h>
 #include <string_view>
 
-///\todo enum TType {
-// T_STOP       = 0,
-//    T_UTF7       = 11,
-//    T_STRUCT     = 12,
-//    T_SET        = 14,
-//    T_UTF8       = 16,
-//    T_UTF16      = 17
-//};
+///\todo Some types were unpesialized:
+/// T_STOP       = 0,
+/// T_UTF7       = 11,
+/// T_STRUCT     = 12,
+/// T_UTF8       = 16,
+/// T_UTF16      = 17
 
 namespace apache::thrift::serialize {
 
