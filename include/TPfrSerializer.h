@@ -7,7 +7,7 @@
 #include <thrift/protocol/TProtocol.h>
 #include <type_traits>
 
-namespace apache::thrift::serialization {
+namespace apache::thrift::serialize {
 
 template <class Model> class TPfrSerializer {
   std::shared_ptr<protocol::TProtocol> protocol_;
@@ -27,10 +27,10 @@ public:
     boost::pfr::for_each_field(data, [&](auto &field, const size_t index) {
       using field_type =
           typename std::remove_reference_t<decltype(field)>::value_type;
-      if (field.isEmpty())
+      if (field.IsEmpty())
         return;
-      TPfrFieldHandler<field_type>::handle(field.getValue(), field.getName(),
-                                           index, totalBytesWriten_, protocol_);
+      TPfrFieldHandler<field_type>::handle(field.Value(), field.Name(), index,
+                                           totalBytesWriten_, protocol_);
     });
     totalBytesWriten_ += protocol_->writeStructEnd();
 
@@ -38,4 +38,4 @@ public:
   }
 };
 
-} // namespace apache::thrift::serialization
+} // namespace apache::thrift::serialize

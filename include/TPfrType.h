@@ -1,6 +1,6 @@
 #pragma once
 
-namespace apache::thrift::serialization {
+namespace apache::thrift::serialize {
 ///\todo
 ///    T_SET        = 14,
 ///    T_LIST       = 15,

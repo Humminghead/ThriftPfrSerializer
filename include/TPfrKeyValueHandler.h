@@ -3,7 +3,7 @@
 #include <thrift/protocol/TProtocol.h>
 #include <utility>
 
-namespace apache::thrift::serialization {
+namespace apache::thrift::serialize {
 
 template <typename T>
 uint32_t write(const T &value, protocol::TProtocol *protocol);
