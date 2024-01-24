@@ -4,6 +4,8 @@
 
 namespace apache::thrift::serialize {
 
+using TModelName = const char* const;
+
 template <typename T> class TModelField {
 public:
   using value_type = T;

@@ -1,6 +1,6 @@
 #include "TModelField.h"
 #include "TPfrSerializer.h"
-#include <iostream>
+#include "TPfrDeSerializer.h"
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/protocol/TCompactProtocol.h>
 #include <thrift/protocol/TJSONProtocol.h>
@@ -17,8 +17,7 @@
 using namespace apache::thrift;
 
 struct MyModel {
-  static constexpr auto name = "MyModel";
-
+  static constexpr serialize::TModelName name = "MyModel";
   serialize::TModelField<bool> f0{"Bool", {}, false};
   serialize::TModelField<char> f1{"Char", {}, false};
   serialize::TModelField<int8_t> f2{"Int8", {}, false};
@@ -38,7 +37,7 @@ struct MyModel {
 
 int main() {
   auto trans = std::make_shared<transport::TSimpleFileTransport>(
-      "/tmp/json.bin", false, true);
+      "/tmp/out.json", true, true);
   auto proto = std::make_shared<protocol::TJSONProtocol>(trans);
 
   MyModel data;
@@ -46,10 +45,11 @@ int main() {
   data.f9.SetValue(2.5);
   data.f10.ModValue().try_emplace(4, 5);
   data.f12.ModValue().push_back(12);
-  // data.f12.ModValue().emplace(7);
   serialize::TPfrSerializer<MyModel> serialzer(proto);
+  serialize::TPfrDeserializer<MyModel> deserialzer(proto);
 
-  serialzer.serialize(std::move(data));
+  // serialzer.serialize(data);
+  deserialzer.deserialize(data);
 
   return 0;
 }
