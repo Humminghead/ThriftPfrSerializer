@@ -19,7 +19,7 @@ public:
   TPfrSerializer(std::shared_ptr<protocol::TProtocol> proto)
       : protocol_(std::move(proto)) {}
 
-  bool serialize(const thrift_model &modelData) {
+  const uint32_t& serialize(const thrift_model &modelData) {
     static_assert(std::is_class_v<std::decay_t<thrift_model>>,
                   "Data isn't class or struct!");
     totalBytesWriten_ = 0;
@@ -34,7 +34,7 @@ public:
     });
     totalBytesWriten_ += protocol_->writeStructEnd();
 
-    return (totalBytesWriten_ > 0);
+    return totalBytesWriten_;
   }
 };
 } // namespace apache::thrift::serialize

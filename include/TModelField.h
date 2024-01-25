@@ -28,7 +28,7 @@ public:
   }
   auto SetEmpty(const bool empty) noexcept { mEmpty = empty; }
 
-  auto &ModValue() noexcept { return mValue; }
+  auto &Value() noexcept { return mValue; }
   auto &Value() const noexcept { return mValue; }
   auto &Name() const noexcept { return mNname; }
   bool IsEmpty() const noexcept { return mEmpty; };

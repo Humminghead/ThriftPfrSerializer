@@ -22,8 +22,8 @@ template <class Field, class Enable = void> struct TPfrFieldHandler;
  */
 template <> struct TPfrFieldHandler<bool> {
   static void handleWrite(const bool value, const std::string_view &name,
-                     const size_t &index, uint32_t &written,
-                     const std::shared_ptr<protocol::TProtocol> protocol) {
+                          const size_t &index, uint32_t &written,
+                          const std::shared_ptr<protocol::TProtocol> protocol) {
     written +=
         protocol->writeFieldBegin(name.data(), protocol::TType::T_BOOL, index);
     written += protocol->writeBool(value);
@@ -45,8 +45,8 @@ struct TPfrFieldHandler<
                                      std::is_same_v<signed char, Field> ||
                                      std::is_same_v<unsigned char, Field>>> {
   static void handleWrite(const Field &value, const std::string_view &name,
-                     const size_t &index, uint32_t &written,
-                     const std::shared_ptr<protocol::TProtocol> protocol) {
+                          const size_t &index, uint32_t &written,
+                          const std::shared_ptr<protocol::TProtocol> protocol) {
     written +=
         protocol->writeFieldBegin(name.data(), protocol::TType::T_BYTE, index);
     written += protocol->writeByte(static_cast<signed char>(value));
@@ -55,8 +55,8 @@ struct TPfrFieldHandler<
 
   static void handleRead(Field &value, uint32_t &read,
                          const std::shared_ptr<protocol::TProtocol> protocol) {
-      signed char& tLink = reinterpret_cast<signed char&>(value);
-      read += protocol->readByte(tLink);
+    signed char &tLink = reinterpret_cast<signed char &>(value);
+    read += protocol->readByte(tLink);
   }
 };
 
@@ -68,8 +68,8 @@ struct TPfrFieldHandler<Field, typename std::enable_if_t<
                                    std::is_same_v<signed short int, Field> ||
                                    std::is_same_v<unsigned short int, Field>>> {
   static void handleWrite(const Field &value, const std::string_view &name,
-                     const size_t &index, uint32_t &written,
-                     const std::shared_ptr<protocol::TProtocol> protocol) {
+                          const size_t &index, uint32_t &written,
+                          const std::shared_ptr<protocol::TProtocol> protocol) {
     written +=
         protocol->writeFieldBegin(name.data(), protocol::TType::T_I16, index);
     written += protocol->writeI16(static_cast<signed short int>(value));
@@ -78,7 +78,7 @@ struct TPfrFieldHandler<Field, typename std::enable_if_t<
 
   static void handleRead(Field &value, uint32_t &read,
                          const std::shared_ptr<protocol::TProtocol> protocol) {
-      read += protocol->readI16(value);
+    read += protocol->readI16(value);
   }
 };
 
@@ -90,8 +90,8 @@ struct TPfrFieldHandler<
     Field, typename std::enable_if_t<std::is_same_v<signed int, Field> ||
                                      std::is_same_v<unsigned int, Field>>> {
   static void handleWrite(const Field &value, const std::string_view &name,
-                     const size_t &index, uint32_t &written,
-                     const std::shared_ptr<protocol::TProtocol> protocol) {
+                          const size_t &index, uint32_t &written,
+                          const std::shared_ptr<protocol::TProtocol> protocol) {
     written +=
         protocol->writeFieldBegin(name.data(), protocol::TType::T_I32, index);
     written += protocol->writeI32(static_cast<signed int>(value));
@@ -100,8 +100,8 @@ struct TPfrFieldHandler<
 
   static void handleRead(Field &value, uint32_t &read,
                          const std::shared_ptr<protocol::TProtocol> protocol) {
-      signed int& tLink = reinterpret_cast<signed int&>(value);
-      read += protocol->readI32(tLink);
+    signed int &tLink = reinterpret_cast<signed int &>(value);
+    read += protocol->readI32(tLink);
   }
 };
 
@@ -113,8 +113,8 @@ struct TPfrFieldHandler<Field, typename std::enable_if_t<
                                    std::is_same_v<signed long int, Field> ||
                                    std::is_same_v<unsigned long int, Field>>> {
   static void handleWrite(const Field &value, const std::string_view &name,
-                     const size_t &index, uint32_t &written,
-                     const std::shared_ptr<protocol::TProtocol> protocol) {
+                          const size_t &index, uint32_t &written,
+                          const std::shared_ptr<protocol::TProtocol> protocol) {
     written +=
         protocol->writeFieldBegin(name.data(), protocol::TType::T_I64, index);
     written += protocol->writeI64(static_cast<signed long int>(value));
@@ -123,8 +123,8 @@ struct TPfrFieldHandler<Field, typename std::enable_if_t<
 
   static void handleRead(Field &value, uint32_t &read,
                          const std::shared_ptr<protocol::TProtocol> protocol) {
-      signed long int& tLink = reinterpret_cast<signed long int&>(value);
-      read += protocol->readI64(tLink);
+    signed long int &tLink = reinterpret_cast<signed long int &>(value);
+    read += protocol->readI64(tLink);
   }
 };
 
@@ -135,8 +135,8 @@ template <class Field>
 struct TPfrFieldHandler<
     Field, typename std::enable_if_t<std::is_floating_point_v<Field>>> {
   static void handleWrite(const Field &value, const std::string_view &name,
-                     const size_t &index, uint32_t &written,
-                     const std::shared_ptr<protocol::TProtocol> protocol) {
+                          const size_t &index, uint32_t &written,
+                          const std::shared_ptr<protocol::TProtocol> protocol) {
     written += protocol->writeFieldBegin(name.data(), protocol::TType::T_DOUBLE,
                                          index);
     written += protocol->writeDouble(static_cast<double>(value));
@@ -161,9 +161,9 @@ struct TPfrFieldHandler<
 template <class Key, class Value>
 struct TPfrFieldHandler<std::map<Key, Value>> {
   static void handleWrite(const std::map<Key, Value> &map,
-                     const std::string_view &name, const size_t &index,
-                     uint32_t &written,
-                     const std::shared_ptr<protocol::TProtocol> protocol) {
+                          const std::string_view &name, const size_t &index,
+                          uint32_t &written,
+                          const std::shared_ptr<protocol::TProtocol> protocol) {
     written +=
         protocol->writeFieldBegin(name.data(), protocol::TType::T_MAP, index);
     written += protocol->writeMapBegin(TPfrType<Key>::type,
@@ -175,9 +175,29 @@ struct TPfrFieldHandler<std::map<Key, Value>> {
     written += protocol->writeFieldEnd();
   }
 
-  static void handleRead(std::map<Key, Value> &value, uint32_t &read,
+  static void handleRead(std::map<Key, Value> &map, uint32_t &read,
                          const std::shared_ptr<protocol::TProtocol> protocol) {
-      // read += protocol->readBool(value);
+    protocol::TType keyType{}, valueType{};
+    uint32_t mapSize{0};
+    read += protocol->readMapBegin(keyType, valueType, mapSize);
+    handleMapRecord(map, mapSize, read, protocol);
+  }
+
+private:
+  static void
+  handleMapRecord(std::map<Key, Value> &map, uint32_t &mapSize,
+                  uint32_t &bytesRead,
+                  const std::shared_ptr<protocol::TProtocol> protocol) {
+    if (mapSize == 0) {
+      bytesRead += protocol->readMapEnd();
+      return;
+    }
+    auto pair = std::make_pair<Key, Value>({}, {});
+    TPfrFieldHandler<Key>::handleRead(pair.first, bytesRead, protocol);
+    TPfrFieldHandler<Value>::handleRead(pair.second, bytesRead, protocol);
+    map.emplace(std::move(pair));
+    mapSize -= 1;
+    handleMapRecord(map, mapSize, bytesRead, protocol);
   }
 };
 
@@ -186,17 +206,17 @@ struct TPfrFieldHandler<std::map<Key, Value>> {
  */
 template <> struct TPfrFieldHandler<std::string> {
   static void handleWrite(const std::string &s, const std::string_view &name,
-                     const size_t &index, uint32_t &written,
-                     const std::shared_ptr<protocol::TProtocol> protocol) {
+                          const size_t &index, uint32_t &written,
+                          const std::shared_ptr<protocol::TProtocol> protocol) {
     written += protocol->writeFieldBegin(name.data(), protocol::TType::T_STRING,
                                          index);
     written += protocol->writeString(s);
     written += protocol->writeFieldEnd();
   }
 
-  static void handleRead(std::string &value, uint32_t &read,
+  static void handleRead(std::string &s, uint32_t &read,
                          const std::shared_ptr<protocol::TProtocol> protocol) {
-      // read += protocol->readBool(value);
+    read += protocol->readString(s);
   }
 };
 
@@ -204,9 +224,10 @@ template <> struct TPfrFieldHandler<std::string> {
  * \brief T_STRING specialization for string_view
  */
 template <> struct TPfrFieldHandler<std::string_view> {
-  static void handleWrite(const std::string_view &s, const std::string_view &name,
-                     const size_t &index, uint32_t &written,
-                     const std::shared_ptr<protocol::TProtocol> protocol) {
+  static void handleWrite(const std::string_view &s,
+                          const std::string_view &name, const size_t &index,
+                          uint32_t &written,
+                          const std::shared_ptr<protocol::TProtocol> protocol) {
     written += protocol->writeFieldBegin(name.data(), protocol::TType::T_STRING,
                                          index);
     written +=
@@ -217,7 +238,11 @@ template <> struct TPfrFieldHandler<std::string_view> {
 
   static void handleRead(std::string_view &value, uint32_t &read,
                          const std::shared_ptr<protocol::TProtocol> protocol) {
-      // read += protocol->readBool(value);
+    std::string tStr{};
+    tStr.reserve(128);
+    read += protocol->readString(tStr);
+    ///\warning Danger operation. Memory corruption is possible
+    // memcpy((void *)value.data(), tStr.data(), tStr.size());
   }
 };
 
@@ -225,9 +250,10 @@ template <> struct TPfrFieldHandler<std::string_view> {
  * \brief T_LIST specialization
  */
 template <class Value> struct TPfrFieldHandler<std::list<Value>> {
-  static void handleWrite(const std::list<Value> &lst, const std::string_view &name,
-                     const size_t &index, uint32_t &written,
-                     const std::shared_ptr<protocol::TProtocol> protocol) {
+  static void handleWrite(const std::list<Value> &lst,
+                          const std::string_view &name, const size_t &index,
+                          uint32_t &written,
+                          const std::shared_ptr<protocol::TProtocol> protocol) {
     written +=
         protocol->writeFieldBegin(name.data(), protocol::TType::T_LIST, index);
     written += protocol->writeListBegin(TPfrType<Value>::type, lst.size());
@@ -238,9 +264,28 @@ template <class Value> struct TPfrFieldHandler<std::list<Value>> {
     written += protocol->writeFieldEnd();
   }
 
-  static void handleRead(std::list<Value> &value, uint32_t &read,
+  static void handleRead(std::list<Value> &list, uint32_t &read,
                          const std::shared_ptr<protocol::TProtocol> protocol) {
-      // read += protocol->readBool(value);
+    protocol::TType valueType{};
+    uint32_t listSize{0};
+    read += protocol->readListBegin(valueType, listSize);
+    handleListRecord(list, listSize, read, protocol);
+  }
+
+private:
+  static void
+  handleListRecord(std::list<Value> &list, uint32_t &listSize,
+                   uint32_t &bytesRead,
+                   const std::shared_ptr<protocol::TProtocol> protocol) {
+    if (listSize == 0) {
+      bytesRead += protocol->readListEnd();
+      return;
+    }
+    Value tVal{};
+    TPfrFieldHandler<Value>::handleRead(tVal, bytesRead, protocol);
+    list.emplace_back(std::move(tVal));
+    listSize -= 1;
+    handleListRecord(list, listSize, bytesRead, protocol);
   }
 };
 
@@ -248,9 +293,10 @@ template <class Value> struct TPfrFieldHandler<std::list<Value>> {
  * \brief T_SET specialization
  */
 template <class Value> struct TPfrFieldHandler<std::set<Value>> {
-  static void handleWrite(const std::set<Value> &set, const std::string_view &name,
-                     const size_t &index, uint32_t &written,
-                     const std::shared_ptr<protocol::TProtocol> protocol) {
+  static void handleWrite(const std::set<Value> &set,
+                          const std::string_view &name, const size_t &index,
+                          uint32_t &written,
+                          const std::shared_ptr<protocol::TProtocol> protocol) {
     written +=
         protocol->writeFieldBegin(name.data(), protocol::TType::T_SET, index);
     written += protocol->writeSetBegin(TPfrType<Value>::type, set.size());
@@ -263,7 +309,7 @@ template <class Value> struct TPfrFieldHandler<std::set<Value>> {
 
   static void handleRead(std::set<Value> &value, uint32_t &read,
                          const std::shared_ptr<protocol::TProtocol> protocol) {
-      // read += protocol->readBool(value);
+    // read += protocol->readBool(value);
   }
 };
 

@@ -24,7 +24,7 @@ public:
     mTemp_.reserve(1024);
   }
 
-  bool deserialize(thrift_model &modelData) {
+  const uint32_t& deserialize(thrift_model &modelData) {
     static_assert(std::is_class_v<std::decay_t<thrift_model>>,
                   "Data isn't class or struct!");
     totalBytesRead_ = 0;
@@ -42,18 +42,22 @@ public:
     boost::pfr::for_each_field(modelData, [&](auto &field, const size_t index) {
       using field_type =
           typename std::remove_reference_t<decltype(field)>::value_type;
-      if (index == mId) {
-        field.SetEmpty(false);
-        TPfrFieldHandler<field_type>::handleRead(field.ModValue(),
-                                                 totalBytesRead_, protocol_);
-        totalBytesRead_ += protocol_->readFieldEnd();
-        totalBytesRead_ += protocol_->readFieldBegin(mTemp_, mType, mId);
-      } else {
-        field.SetEmpty(true);
+      if (mType != protocol::TType::T_STOP) {
+        if (index == mId) {
+          field.SetEmpty(false);
+          TPfrFieldHandler<field_type>::handleRead(field.Value(),
+                                                   totalBytesRead_, protocol_);
+          totalBytesRead_ += protocol_->readFieldEnd();
+          mTemp_.clear();
+          mId = 0;
+          totalBytesRead_ += protocol_->readFieldBegin(mTemp_, mType, mId);
+        } else {
+          field.SetEmpty(true);
+        }
       }
     });
     totalBytesRead_ += protocol_->readStructEnd();
-    return (totalBytesRead_ > 0);
+    return totalBytesRead_;
   }
 };
 } // namespace apache::thrift::serialize

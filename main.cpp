@@ -29,27 +29,31 @@ struct MyModel {
   serialize::TModelField<float> f8{"Float", {}, false};
   serialize::TModelField<double> f9{"Double", {3.8}, false};
   serialize::TModelField<std::map<int, double>> f10{"Map", {}, false};
-  serialize::TModelField<std::string> f11{"String", {"string"}, false};
+  serialize::TModelField<std::string> f11{"String", {"Hello Thrift"}, false};
   serialize::TModelField<std::list<int>> f12{"List", {1,2,3}, false};
   serialize::TModelField<std::string_view> f13{
       "StringView", {"string_view"}, false};
 };
 
 int main() {
-  auto trans = std::make_shared<transport::TSimpleFileTransport>(
-      "/tmp/out.json", true, true);
-  auto proto = std::make_shared<protocol::TJSONProtocol>(trans);
+  auto transWr = std::make_shared<transport::TSimpleFileTransport>(
+      "/tmp/out.json", false, true);
+  auto transRd = std::make_shared<transport::TSimpleFileTransport>(
+        "/tmp/out.json", true, false);
+  auto protoWr = std::make_shared<protocol::TJSONProtocol>(transWr);
+  auto protoRd = std::make_shared<protocol::TJSONProtocol>(transRd);
 
   MyModel data;
   data.f2.SetValue(1);
   data.f9.SetValue(2.5);
-  data.f10.ModValue().try_emplace(4, 5);
-  data.f12.ModValue().push_back(12);
-  serialize::TPfrSerializer<MyModel> serialzer(proto);
-  serialize::TPfrDeserializer<MyModel> deserialzer(proto);
+  data.f10.Value().try_emplace(4, 5);
+  data.f10.Value().try_emplace(6, 7);
+  data.f12.Value().push_back(12);
+  serialize::TPfrSerializer<MyModel> serialzer(protoWr);
+  serialize::TPfrDeserializer<MyModel> deserialzer(protoRd);
 
-  // serialzer.serialize(data);
-  deserialzer.deserialize(data);
+  auto wr = serialzer.serialize(data);
+  auto rd = deserialzer.deserialize(data);
 
-  return 0;
+  return wr == rd;
 }
