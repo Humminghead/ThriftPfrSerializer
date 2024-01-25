@@ -19,9 +19,9 @@ template <class Model> class TPfrDeserializer {
 public:
   using thrift_model = Model;
 
-  TPfrDeserializer(std::shared_ptr<protocol::TProtocol> proto)
+  TPfrDeserializer(std::shared_ptr<protocol::TProtocol> proto, const size_t tempStrCapacity = 128)
       : protocol_(std::move(proto)) {
-    mTemp_.reserve(1024);
+    mTemp_.reserve(tempStrCapacity);
   }
 
   const uint32_t& deserialize(thrift_model &modelData) {

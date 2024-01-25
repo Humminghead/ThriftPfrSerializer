@@ -15,7 +15,11 @@
 
 namespace apache::thrift::serialize {
 
-template <class Field, class Enable = void> struct TPfrFieldHandler;
+template <class Field, class Enable = void> struct TPfrFieldHandler {
+  static_assert(
+      false,
+      "Unsupported type! Please specify TPfrFieldHandler for your type!");
+};
 
 /*!
  * \brief T_BOOL specialization
@@ -241,8 +245,12 @@ template <> struct TPfrFieldHandler<std::string_view> {
     std::string tStr{};
     tStr.reserve(128);
     read += protocol->readString(tStr);
+
+    if(value.empty()) return;
+
     ///\warning Danger operation. Memory corruption is possible
-    // memcpy((void *)value.data(), tStr.data(), tStr.size());
+    memcpy((void *)value.data(), tStr.data(),
+           std::min(tStr.size(), value.size()));
   }
 };
 
