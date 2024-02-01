@@ -10,8 +10,7 @@
 namespace apache::thrift::serialize {
 
 template <class Model> class TPfrDeserializer {
-  std::shared_ptr<protocol::TProtocol> protocol_;
-  uint32_t totalBytesRead_;
+  std::shared_ptr<protocol::TProtocol> protocol_;  
   std::string mTemp_{};
   protocol::TType mType{};
   int16_t mId{0};
@@ -24,20 +23,20 @@ public:
     mTemp_.reserve(tempStrCapacity);
   }
 
-  const uint32_t& deserialize(thrift_model &modelData) {
+  uint32_t deserialize(thrift_model &modelData) {
     static_assert(std::is_class_v<std::decay_t<thrift_model>>,
                   "Data isn't class or struct!");
-    totalBytesRead_ = 0;
+    uint32_t totalBytesRead = 0;
     mType = {};
     mId = {};
     mTemp_.clear();
 
     // Read begin
-    totalBytesRead_ += protocol_->readStructBegin(mTemp_);
+    totalBytesRead += protocol_->readStructBegin(mTemp_);
     mTemp_.clear();
 
     // First read
-    totalBytesRead_ += protocol_->readFieldBegin(mTemp_, mType, mId);
+    totalBytesRead += protocol_->readFieldBegin(mTemp_, mType, mId);
     ///\todo if mType == T_STOP?
     boost::pfr::for_each_field(modelData, [&](auto &field, const size_t index) {
       using field_type =
@@ -46,18 +45,25 @@ public:
         if (index == mId) {
           field.SetEmpty(false);
           TPfrFieldHandler<field_type>::handleRead(field.Value(),
-                                                   totalBytesRead_, protocol_);
-          totalBytesRead_ += protocol_->readFieldEnd();
+                                                   totalBytesRead, protocol_);
+          totalBytesRead += protocol_->readFieldEnd();
           mTemp_.clear();
           mId = 0;
-          totalBytesRead_ += protocol_->readFieldBegin(mTemp_, mType, mId);
+          totalBytesRead += protocol_->readFieldBegin(mTemp_, mType, mId);
         } else {
           field.SetEmpty(true);
         }
       }
     });
-    totalBytesRead_ += protocol_->readStructEnd();
-    return totalBytesRead_;
+    totalBytesRead += protocol_->readStructEnd();
+    return totalBytesRead;
+  }
+
+  thrift_model deserialize(uint32_t& totalBytesRead)
+  {
+      thrift_model message;
+      totalBytesRead += deserialize(message);
+      return message;
   }
 };
 } // namespace apache::thrift::serialize

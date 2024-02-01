@@ -1,6 +1,7 @@
 #include "TModelField.h"
 #include "TPfrDeSerializer.h"
 #include "TPfrSerializer.h"
+#include <filesystem>
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/protocol/TCompactProtocol.h>
 #include <thrift/protocol/TJSONProtocol.h>
@@ -33,9 +34,10 @@ struct MyModel {
   serialize::TModelField<std::list<int>> f12{"List", {1, 2, 3}, false};  
 };
 
-void serializeExample(){
+void serializeExample(std::filesystem::path&& path)
+{
     auto transWr = std::make_shared<transport::TSimpleFileTransport>(
-        "/tmp/out.json", false, true);
+        path.string(), false, true);
 
     auto protoWr = std::make_shared<protocol::TJSONProtocol>(transWr);
     serialize::TPfrSerializer<MyModel> serialzer(protoWr);
@@ -45,14 +47,13 @@ void serializeExample(){
     data.f9.SetValue(2.5);
     data.f10.Value().try_emplace(4, 5);
     data.f10.Value().try_emplace(6, 7);
-    data.f12.Value().push_back(12);
-
+    data.f12.Value().push_back(12);    
     serialzer.serialize(data);
 }
 
-void deserializeExample(){
+void deserializeExample(std::filesystem::path&& path){
     auto transRd = std::make_shared<transport::TSimpleFileTransport>(
-        "/tmp/out.json", true, false);
+        path.string(), true, false);
 
     auto protoRd = std::make_shared<protocol::TJSONProtocol>(transRd);
 
@@ -60,6 +61,28 @@ void deserializeExample(){
     serialize::TPfrDeserializer<MyModel> deserialzer(protoRd);
 
     deserialzer.deserialize(data);
+}
+
+
+void deserializeMultipleMessagesExample(){
+    for (int i = 0; i < 5; i++)
+        serializeExample("/tmp/out_multiple.json");
+
+    auto transRd = std::make_shared<transport::TSimpleFileTransport>(
+        "/tmp/out_multiple.json", true, false);
+
+    auto protoRd = std::make_shared<protocol::TJSONProtocol>(transRd);
+
+    off_t fileSize{0};
+    fileSize = lseek(transRd->getFD(), 0, SEEK_END);
+    lseek(transRd->getFD(), 0, SEEK_SET);
+
+    std::vector<MyModel> data;
+    serialize::TPfrDeserializer<MyModel> deserialzer(protoRd);
+
+    for (uint32_t readBytes = 0; readBytes < fileSize;) {
+        data.push_back(deserialzer.deserialize(readBytes));
+    }
 }
 
 
@@ -97,11 +120,11 @@ void deserializeStringViewExample(){
     int compare{};
 }
 
-
 int main()
 {
-    serializeExample();
-    deserializeExample();
+    serializeExample("/tmp/out.json");
+    deserializeExample("/tmp/out.json");
+    deserializeMultipleMessagesExample();
     deserializeStringViewExample();
 
     return 0;
