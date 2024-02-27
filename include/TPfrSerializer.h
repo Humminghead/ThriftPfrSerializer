@@ -8,7 +8,10 @@
 #include <type_traits>
 
 namespace apache::thrift::serialize {
-
+/**
+ * Serializes a given protocol to memory, disk, or over a network from a
+ * model
+ */
 template <class Model> class TPfrSerializer {
   std::shared_ptr<protocol::TProtocol> protocol_;
   uint32_t totalBytesWriten_;
@@ -19,7 +22,7 @@ public:
   TPfrSerializer(std::shared_ptr<protocol::TProtocol> proto)
       : protocol_(std::move(proto)) {}
 
-  const uint32_t& serialize(const thrift_model &modelData) {
+  const uint32_t &serialize(const thrift_model &modelData) {
     static_assert(std::is_class_v<std::decay_t<thrift_model>>,
                   "Data isn't class or struct!");
     totalBytesWriten_ = 0;
