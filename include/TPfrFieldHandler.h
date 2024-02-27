@@ -6,6 +6,10 @@
 #include <memory.h>
 #include <string_view>
 
+/**
+ * The collection of specializations for the most common types
+ **/
+
 ///\todo Some types were unpesialized:
 /// T_STOP       = 0,
 /// T_UTF7       = 11,
@@ -15,6 +19,9 @@
 
 namespace apache::thrift::serialize {
 
+/**
+ * \brief Specialization for any type
+ */
 template <class Field, class Enable = void> struct TPfrFieldHandler {
   static_assert(
       false,
@@ -246,7 +253,8 @@ template <> struct TPfrFieldHandler<std::string_view> {
     tStr.reserve(128);
     read += protocol->readString(tStr);
 
-    if(value.empty()) return;
+    if (value.empty())
+      return;
 
     ///\warning Danger operation. Memory corruption is possible
     memcpy((void *)value.data(), tStr.data(),

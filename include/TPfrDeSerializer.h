@@ -8,9 +8,12 @@
 #include <type_traits>
 
 namespace apache::thrift::serialize {
-
+/**
+ *  Deserializes a given protocol from memory, disk, or over a network into
+ * model
+ */
 template <class Model> class TPfrDeserializer {
-  std::shared_ptr<protocol::TProtocol> protocol_;  
+  std::shared_ptr<protocol::TProtocol> protocol_;
   std::string mTemp_{};
   protocol::TType mType{};
   int16_t mId{0};
@@ -18,7 +21,8 @@ template <class Model> class TPfrDeserializer {
 public:
   using thrift_model = Model;
 
-  TPfrDeserializer(std::shared_ptr<protocol::TProtocol> proto, const size_t tempStrCapacity = 128)
+  TPfrDeserializer(std::shared_ptr<protocol::TProtocol> proto,
+                   const size_t tempStrCapacity = 128)
       : protocol_(std::move(proto)) {
     mTemp_.reserve(tempStrCapacity);
   }
@@ -37,7 +41,7 @@ public:
 
     // First read
     totalBytesRead += protocol_->readFieldBegin(mTemp_, mType, mId);
-    ///\todo if mType == T_STOP?
+
     boost::pfr::for_each_field(modelData, [&](auto &field, const size_t index) {
       using field_type =
           typename std::remove_reference_t<decltype(field)>::value_type;
@@ -59,11 +63,10 @@ public:
     return totalBytesRead;
   }
 
-  thrift_model deserialize(uint32_t& totalBytesRead)
-  {
-      thrift_model message;
-      totalBytesRead += deserialize(message);
-      return message;
+  thrift_model deserialize(uint32_t &totalBytesRead) {
+    thrift_model message;
+    totalBytesRead += deserialize(message);
+    return message;
   }
 };
 } // namespace apache::thrift::serialize
