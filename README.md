@@ -117,7 +117,7 @@ struct MyModel {
 ```
 All other fields remain empty (TModelField::IsEmpty() returns true).
 
-Additional examples are available at [example](https://github.com/Humminghead/ThriftPfrSerializer/tree/examples-and-readme/example) directory
+Additional examples are available at [example](https://github.com/Humminghead/ThriftPfrSerializer/tree/main/example) directory
 
 ## Requirements
 - Compiler with support C++17 
