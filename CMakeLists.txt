@@ -14,15 +14,27 @@ option(TPFR_BuildExamples     "Build the examples." ${TPFR_BuildExamples_INIT})
 ##
 ## COFIG
 ##
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
 set(TPFR_CONFIG_INSTALL_DIR        "${CMAKE_INSTALL_DATADIR}/cmake/${PROJECT_NAME}" CACHE INTERNAL "")
 set(TPFR_CMAKE_VERSION_CONFIG_FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake")
 set(TPFR_INCLUDE_BUILD_DIR         "${PROJECT_SOURCE_DIR}/include/")
-set(TPFR_INCLUDE_INSTALL_DIR       "${CMAKE_INSTALL_INCLUDEDIR}")
+set(TPFR_INCLUDE_INSTALL_DIR       "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}")
 set(TPFR_CMAKE_VERSION_CONFIG_FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake")
 set(TPFR_CMAKE_PROJECT_CONFIG_FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake")
 if (TPFR_SystemInclude)
     set(TPFR_SYSTEM_INCLUDE "SYSTEM")
 endif()
+set(TPFR_PKGCONFIG_INSTALL_DIR     "${CMAKE_INSTALL_DATADIR}/pkgconfig")
+
+# Create configuration files
+configure_package_config_file( "${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in"
+                               "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+                               INSTALL_DESTINATION
+                               ${TPFR_CONFIG_INSTALL_DIR}/cmake
+                               PATH_VARS TPFR_INCLUDE_INSTALL_DIR TPFR_CONFIG_INSTALL_DIR
+                               )
 
 ##
 ## TARGET
@@ -68,5 +80,9 @@ if(TPFR_Install)
     install(
         FILES ${TPFR_CMAKE_PROJECT_CONFIG_FILE} ${TPFR_CMAKE_VERSION_CONFIG_FILE}
         DESTINATION ${TPFR_CONFIG_INSTALL_DIR}
+    )
+    install(
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc"
+        DESTINATION ${TPFR_PKGCONFIG_INSTALL_DIR}
     )
 endif()
