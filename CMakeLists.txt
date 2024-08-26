@@ -17,12 +17,17 @@ option(TPFR_BuildExamples     "Build the examples." ${TPFR_BuildExamples_INIT})
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
+set(TPFR_TARGET_NAME               "${PROJECT_NAME}")
 set(TPFR_CONFIG_INSTALL_DIR        "${CMAKE_INSTALL_DATADIR}/cmake/${PROJECT_NAME}" CACHE INTERNAL "")
 set(TPFR_CMAKE_VERSION_CONFIG_FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake")
 set(TPFR_INCLUDE_BUILD_DIR         "${PROJECT_SOURCE_DIR}/include/")
 set(TPFR_INCLUDE_INSTALL_DIR       "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}")
 set(TPFR_CMAKE_VERSION_CONFIG_FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake")
 set(TPFR_CMAKE_PROJECT_CONFIG_FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake")
+set(TPFR_CMAKE_CONFIG_DIR          "${CMAKE_CURRENT_BINARY_DIR}")
+set(TPFR_TARGETS_EXPORT_NAME       "${PROJECT_NAME}Targets")
+set(TPFR_CMAKE_PROJECT_TARGETS_FILE "${TPFR_CMAKE_CONFIG_DIR}/${PROJECT_NAME}Targets.cmake")
+
 if (TPFR_SystemInclude)
     set(TPFR_SYSTEM_INCLUDE "SYSTEM")
 endif()
@@ -84,5 +89,21 @@ if(TPFR_Install)
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc"
         DESTINATION ${TPFR_PKGCONFIG_INSTALL_DIR}
+    )
+    # https://stackoverflow.com/questions/49857596/simple-find-package-config-file-example
+    export(
+       TARGETS ${TPFR_TARGET_NAME}
+       NAMESPACE ${PROJECT_NAME}::
+       FILE ${TPFR_CMAKE_PROJECT_TARGETS_FILE}
+    )
+    install(
+       TARGETS ${TPFR_TARGET_NAME}
+       EXPORT ${TPFR_TARGETS_EXPORT_NAME}
+       INCLUDES DESTINATION ${TPFR_INCLUDE_INSTALL_DIR}
+    )
+    install(
+        EXPORT ${TPFR_TARGETS_EXPORT_NAME}
+        NAMESPACE ${PROJECT_NAME}::
+        DESTINATION ${TPFR_CONFIG_INSTALL_DIR}
     )
 endif()
