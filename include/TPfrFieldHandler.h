@@ -283,7 +283,7 @@ template <> struct TPfrFieldHandler<std::vector<char>> {
     static void handleRead(std::vector<char> &value, uint32_t &read,
                            const std::shared_ptr<protocol::TProtocol> protocol) {
         std::string tStr{};
-        tStr.reserve(128);///\todo why 128?
+        tStr.reserve(value.capacity());
         read += protocol->readString(tStr);
 
         if (value.empty())
