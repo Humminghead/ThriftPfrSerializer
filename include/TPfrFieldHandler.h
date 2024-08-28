@@ -263,6 +263,39 @@ template <> struct TPfrFieldHandler<std::string_view> {
 };
 
 /*!
+ * \brief T_STRING specialization for vector<char>
+ */
+template <> struct TPfrFieldHandler<std::vector<char>> {
+    static void handleWrite(const std::vector<char> &s,
+                            const std::string_view &name, const size_t &index,
+                            uint32_t &written,
+                            const std::shared_ptr<protocol::TProtocol> protocol) {
+        written += protocol->writeFieldBegin(name.data(), protocol::TType::T_STRING,
+                                             index);
+        std::string tmp;
+        tmp.reserve(s.size());
+        std::copy(std::begin(s),std::end(s),std::back_inserter(tmp));
+        written +=
+            protocol->writeBinary(tmp);
+        written += protocol->writeFieldEnd();
+    }
+
+    static void handleRead(std::vector<char> &value, uint32_t &read,
+                           const std::shared_ptr<protocol::TProtocol> protocol) {
+        std::string tStr{};
+        tStr.reserve(128);///\todo why 128?
+        read += protocol->readString(tStr);
+
+        if (value.empty())
+            return;
+
+        value.clear();
+        value.reserve(tStr.size());
+        std::copy(std::begin(tStr), std::end(tStr), std::back_inserter(value));
+    }
+};
+
+/*!
  * \brief T_LIST specialization
  */
 template <class Value> struct TPfrFieldHandler<std::list<Value>> {
