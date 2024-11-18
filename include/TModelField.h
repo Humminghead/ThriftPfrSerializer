@@ -33,6 +33,31 @@ public:
       : mNname{name}, mValue{std::move(value)}, mEmpty{empty} {}
 
   /**
+    Copy\Move operations
+   */
+  TModelField(const TModelField &f) {
+      mEmpty = f.mEmpty;
+      mValue = f.mValue;
+  }
+
+  TModelField(TModelField &&f) {
+      mEmpty = std::move(f.mEmpty);
+      mValue = std::move(f.mValue);
+  };
+
+  TModelField &operator=(const TModelField &f) {
+      mEmpty = f.mEmpty;
+      mValue = f.mValue;
+  }
+
+  TModelField &operator=(TModelField &&f) {
+      mEmpty = std::move(f.mEmpty);
+      mValue = std::move(f.mValue);
+  };
+
+  ~TModelField() = default;
+
+  /**
    Sets the field value
    */
   auto SetValue(const T &value) noexcept {
