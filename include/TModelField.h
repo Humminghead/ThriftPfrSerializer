@@ -1,24 +1,12 @@
 #pragma once
 
 #include <TPfrMacro.h>
+#include <TPfrValueEraser.h>
 #include <string_view>
 
 namespace apache::thrift::serialize {
 
 using TModelName = const char *const;
-
-/**
- The ValueEraser class defines how to erase field's value
- */
-template <typename T, typename Enable = void> struct ValueEraser {
-#if GCPP_VERSION >= 130100
-    static_assert(false, "Please specify Erase function!");
-#endif
-};
-
-template <typename T> struct ValueEraser<T, typename std::enable_if_t<std::is_default_constructible_v<T>>::type> {
-    static void Erase(T &value) { value = {}; }
-};
 
 /**
  Class helps to define a communication interface used for the communication
@@ -31,47 +19,51 @@ template <typename T> class TModelField {
     /**
      Creates a model field
      */
-    constexpr TModelField(const std::string_view name, const T &value, bool empty = true)
-        : mNname{name}, mValue{std::move(value)}, mEmpty{empty} {}
+    constexpr TModelField(const std::string_view name, const value_type &value, bool empty = true)
+        : mName{name}, mValue{std::move(value)}, mEmpty{empty} {}
 
-    constexpr TModelField(const std::string_view name, T &&value, bool empty = true)
-        : mNname{name}, mValue{std::move(value)}, mEmpty{empty} {}
+    constexpr TModelField(const std::string_view name, value_type &&value, bool empty = true)
+        : mName{name}, mValue{std::move(value)}, mEmpty{empty} {}
 
-  /**
-    Copy\Move operations
-   */
-  TModelField(const TModelField &f) : mNname{f.mNname} {
-      mEmpty = f.mEmpty;
-      mValue = f.mValue;
-  }
+    /**
+      Copy\Move operations
+     */
+    TModelField(const TModelField &f) : mName{f.mName} {
+        mEmpty = f.mEmpty;
+        mValue = f.mValue;
+    }
 
-  TModelField(TModelField &&f) : mNname{std::move(f.mNname)} {
-      mEmpty = std::move(f.mEmpty);
-      mValue = std::move(f.mValue);
-  };
+    TModelField(TModelField &&f) : mName{std::move(f.mName)} {
+        mEmpty = std::move(f.mEmpty);
+        mValue = std::move(f.mValue);
+    };
 
-  TModelField &operator=(const TModelField &f) {
-      mNname = f.mNname;
-      mEmpty = f.mEmpty;
-      mValue = f.mValue;
-  }
+    TModelField &operator=(const TModelField &f) {
+        mName = f.mName;
+        mEmpty = f.mEmpty;
+        mValue = f.mValue;
 
-  TModelField &operator=(TModelField &&f) {
-      mNname = std::move(f.mNname);
-      mEmpty = std::move(f.mEmpty);
-      mValue = std::move(f.mValue);
-  };
+        return *this;
+    }
+
+    TModelField &operator=(TModelField &&f) {
+        mName = std::move(f.mName);
+        mEmpty = std::move(f.mEmpty);
+        mValue = std::move(f.mValue);
+
+        return *this;
+    };
 
     ~TModelField() = default;
 
     /**
      Sets the field value
      */
-    auto SetValue(const T &value) noexcept {
+    auto SetValue(const value_type &value) noexcept {
         SetEmpty(false);
         mValue = value;
     }
-    auto SetValue(T &&value) noexcept {
+    auto SetValue(value_type &&value) noexcept {
         SetEmpty(false);
         mValue = std::move(value);
     }
@@ -89,7 +81,7 @@ template <typename T> class TModelField {
     /**
      Return the field's name
      */
-    auto &Name() const noexcept { return mNname; }
+    auto &Name() const noexcept { return mName; }
 
     /**
      Return the field's state
@@ -99,11 +91,11 @@ template <typename T> class TModelField {
     /**
      Erarses the field's value to default value
      */
-    void Erase() { ValueEraser<T>::Erase(mValue); }
+    void Erase() { ValueEraser<value_type>::Erase(mValue); }
 
   private:
-    const std::string_view mNname;
-    T mValue;
+    std::string_view mName;
+    value_type mValue;
     bool mEmpty;
 };
 
