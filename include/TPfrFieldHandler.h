@@ -2,6 +2,7 @@
 
 #include "TPfrKeyValueHandler.h"
 #include "TPfrType.h"
+#include "TPfrMacro.h"
 
 #include <memory.h>
 #include <string_view>
@@ -23,9 +24,9 @@ namespace apache::thrift::serialize {
  * \brief Specialization for any type
  */
 template <class Field, class Enable = void> struct TPfrFieldHandler {
-  static_assert(
-      false,
-      "Unsupported type! Please specify TPfrFieldHandler for your type!");
+#if GCPP_VERSION > 130100
+    static_assert(false, "Unsupported type! Please specify TPfrFieldHandler for your type!");
+#endif
 };
 
 /*!
