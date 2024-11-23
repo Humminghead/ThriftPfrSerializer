@@ -297,6 +297,41 @@ template <> struct TPfrFieldHandler<std::vector<char>> {
 };
 
 /*!
+ * \brief T_STRING specialization for array<char,N>
+ */
+template <typename T, size_t N> struct TPfrFieldHandler<std::array<T, N>> {
+    static void handleWrite(
+        const std::array<T, N> &s,
+        const std::string_view &name,
+        const size_t &index,
+        uint32_t &written,
+        const std::shared_ptr<protocol::TProtocol> protocol) {
+        written += protocol->writeFieldBegin(name.data(), protocol::TType::T_STRING, index);
+        std::string tmp;
+        tmp.reserve(s.size());
+        std::copy(std::begin(s), std::end(s), std::back_inserter(tmp));
+        written += protocol->writeBinary(tmp);
+        written += protocol->writeFieldEnd();
+    }
+
+    static void handleRead(
+        std::array<char, N> &value,
+        uint32_t &read,
+        const std::shared_ptr<protocol::TProtocol> protocol) {
+        std::string tStr{};
+        tStr.reserve(value.size());
+        read += protocol->readString(tStr);
+
+        if (value.empty())
+            return;
+
+        value.clear();
+        value.reserve(tStr.size());
+        std::copy(std::begin(tStr), std::end(tStr), std::back_inserter(value));
+    }
+};
+
+/*!
  * \brief T_LIST specialization
  */
 template <class Value> struct TPfrFieldHandler<std::list<Value>> {
@@ -359,6 +394,7 @@ template <class Value> struct TPfrFieldHandler<std::set<Value>> {
 
   static void handleRead(std::set<Value> &value, uint32_t &read,
                          const std::shared_ptr<protocol::TProtocol> protocol) {
+    ///\todo
     // read += protocol->readBool(value);
   }
 };
