@@ -35,22 +35,24 @@ public:
   /**
     Copy\Move operations
    */
-  TModelField(const TModelField &f) {
+  TModelField(const TModelField &f) : mNname{f.mNname} {
       mEmpty = f.mEmpty;
       mValue = f.mValue;
   }
 
-  TModelField(TModelField &&f) {
+  TModelField(TModelField &&f) : mNname{std::move(f.mNname)} {
       mEmpty = std::move(f.mEmpty);
       mValue = std::move(f.mValue);
   };
 
   TModelField &operator=(const TModelField &f) {
+      mNname = f.mNname;
       mEmpty = f.mEmpty;
       mValue = f.mValue;
   }
 
   TModelField &operator=(TModelField &&f) {
+      mNname = std::move(f.mNname);
       mEmpty = std::move(f.mEmpty);
       mValue = std::move(f.mValue);
   };
