@@ -11,7 +11,7 @@ using TModelName = const char *const;
  The ValueEraser class defines how to erase field's value
  */
 template <typename T, typename Enable = void> struct ValueEraser {
-#if GCPP_VERSION > 130100
+#if GCPP_VERSION >= 130100
     static_assert(false, "Please specify Erase function!");
 #endif
 };
