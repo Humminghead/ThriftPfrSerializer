@@ -91,7 +91,7 @@ template <typename T> class TModelField {
     /**
      Erarses the field's value to default value
      */
-    void Erase() { ValueEraser<value_type>::Erase(mValue); }
+    void Erase() { ValueEraser<value_type>::Erase(mValue); SetEmpty(true); }
 
   private:
     std::string_view mName;
