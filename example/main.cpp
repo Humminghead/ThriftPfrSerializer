@@ -14,6 +14,7 @@
 #include <thrift/transport/TVirtualTransport.h>
 
 #include <benchmark/benchmark.h>
+#include <array>
 
 using namespace apache::thrift;
 
@@ -31,7 +32,8 @@ struct MyModel {
   serialize::TModelField<double> f9{"Double", {3.8}};
   serialize::TModelField<std::map<int, double>> f10{"Map", {}};
   serialize::TModelField<std::string> f11{"String", {"Hello Thrift"}, false};
-  serialize::TModelField<std::list<int>> f12{"List", {1, 2, 3}, false};  
+  serialize::TModelField<std::list<int>> f12{"List", {1, 2, 3}, false};
+  serialize::TModelField<std::array<unsigned char, 6>> f13{"Array",{'0','1','2','3','4','5'},false};
 };
 
 void serializeExample(std::filesystem::path&& path)
@@ -47,7 +49,7 @@ void serializeExample(std::filesystem::path&& path)
     data.f9.SetValue(2.5);
     data.f10.Value().try_emplace(4, 5);
     data.f10.Value().try_emplace(6, 7);
-    data.f12.Value().push_back(12);    
+    data.f12.Value().push_back(12);
     serialzer.serialize(data);
 }
 
