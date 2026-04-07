@@ -6,6 +6,7 @@
 
 #include <memory.h>
 #include <string_view>
+#include <array>
 
 /**
  * The collection of specializations for the most common types
@@ -361,6 +362,30 @@ template <class Value> struct TPfrFieldHandler<std::set<Value>> {
                          const std::shared_ptr<protocol::TProtocol> protocol) {
     // read += protocol->readBool(value);
   }
+};
+
+/*!
+ * \brief T_STRING specialization
+ */
+template <size_t N, typename T> struct TPfrFieldHandler<std::array<T,N>> {
+    static void handleWrite(const std::array<T,N> &s, const std::string_view &name,
+                            const size_t &index, uint32_t &written,
+                            const std::shared_ptr<protocol::TProtocol> protocol) {
+        written += protocol->writeFieldBegin(name.data(), protocol::TType::T_STRING,
+                                             index);
+
+        std::string temp{reinterpret_cast<const char*>(s.data()),static_cast<size_t>(N)};
+        written += protocol->writeString(temp);
+        written += protocol->writeFieldEnd();
+    }
+
+    static void handleRead(std::array<T,N> &s, uint32_t &read,
+                           const std::shared_ptr<protocol::TProtocol> protocol) {
+        std::string temp{N,'\x0'};
+        temp.clear();
+        read += protocol->readString(temp);
+        std::memcpy(s.data(),temp.data(),N);
+    }
 };
 
 } // namespace apache::thrift::serialize
